@@ -1,2 +1,2 @@
-# sanic_jwt_scope_aredis
+# sanic_jwt_scope_w_aioredis
 Sanic Sample User Management using scoping 
