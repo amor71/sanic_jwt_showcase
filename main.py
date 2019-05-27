@@ -1,10 +1,12 @@
 from sanic_jwt import Initialize
 from aredis import StrictRedis
-from Routes.users import (
+from Routes.auth import (
     authenticate,
     store_refresh_token,
     retrieve_refresh_token,
 )
+from Routes.users import register
+
 
 import config
 
@@ -28,17 +30,20 @@ def config_app():
     Initialize(
         config.app,
         authenticate=authenticate,
-        refresh_token_enabled=True,
-        store_refresh_token=store_refresh_token,
-        retrieve_refresh_token=retrieve_refresh_token,
+        #       refresh_token_enabled=True,
+        #       store_refresh_token=store_refresh_token,
+        #       retrieve_refresh_token=retrieve_refresh_token,
         debug=True,
         claim_iat=True,
-        scopes_enabled=True,
-        user_id="user_id",
+        #        scopes_enabled=True,
         expiration_delta=60 * 10,
-        url_prefix="",
     )
 
+    #
+    # user routes
+    #
+    config.app.add_route(register, "/users", methods=["POST"])
+    # jogging routes
     #
     # register Idea routes
     #
