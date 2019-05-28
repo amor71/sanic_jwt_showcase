@@ -1,24 +1,13 @@
 from sanic_jwt import Initialize
 from aredis import StrictRedis
-from Routes.auth import (
+from jogging.Routes.auth import (
     authenticate,
-    store_refresh_token,
-    retrieve_refresh_token,
 )
-from Routes.users import register
-
-
-import config
+from jogging.Routes.users import register
+from jogging import config
 
 
 def config_app():
-    #
-    # DB
-    #
-    from dbhelper import do_engine
-
-    do_engine()
-
     #
     # REDIS (refresh_token cache)
     #

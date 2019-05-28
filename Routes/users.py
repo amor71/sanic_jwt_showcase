@@ -4,7 +4,7 @@ from sanic.exceptions import (
     InvalidUsage,
     add_status_code,
 )
-from Models.user import User
+from jogging.Models.user import User
 from .auth import encrypt, password_validator
 
 
@@ -21,15 +21,15 @@ async def register(request, *args, **kwargs):
     ):
         raise InvalidUsage("missing JSON body")
 
-    username = request.json["username"]
-    if User.username_exists(username):
-        raise Conflict(f"username {username} already exists")
-
     password = request.json["password"]
     if not password_validator(password):
         raise InvalidUsage(
             "password does not match minimum requirements"
         )
+
+    username = request.json["username"]
+    if User.username_exists(username):
+        raise Conflict(f"username {username} already exists")
 
     user = User(None, username, encrypt(request.json["password"]))
     user.save()

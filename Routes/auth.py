@@ -1,10 +1,15 @@
 import bcrypt
 from sanic_jwt import exceptions
-import config
-from Models.user import User
+from jogging import config
+from jogging.Models.user import User
 
 
 async def authenticate(request, *args, **kwargs):
+    if (
+        request.json is None
+    ):
+        raise exceptions.AuthenticationFailed("missing payload")
+
     username = request.json.get("username", None)
     password = request.json.get("password", None)
 
@@ -36,7 +41,7 @@ def password_validator(password):
 
 
 def encrypt(password):
-    return bcrypt.hashpw(password, bcrypt.gensalt(14))
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt(14))
 
 
 async def store_refresh_token(user_id, refresh_token, *args, **kwargs):

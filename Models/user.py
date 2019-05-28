@@ -1,6 +1,5 @@
 from sqlalchemy.sql import text
-from dbhelper import engine
-import bcrypt
+from .dbhelper import engine
 
 
 class User(object):
@@ -43,6 +42,7 @@ class User(object):
 
     @classmethod
     def get_by_username(cls, email):
+        assert engine
         s = text(
             "SELECT user_id, user_name, hash_password, roll_id "
             "FROM users "
@@ -58,8 +58,11 @@ class User(object):
 
     @classmethod
     def username_exists(cls, username):
+        assert engine
         s = text(
-            "SELECT * FROM username WHERE username = :username AND expire_date is null"
+            "SELECT * "
+            "FROM users "
+            "WHERE username = :username AND expire_date is null"
         )
         connection = engine.connect()
 
@@ -70,4 +73,6 @@ class User(object):
             else True
         )
         connection.close()
+
+        print(f"username={username} exists={rc}")
         return rc
