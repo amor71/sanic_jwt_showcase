@@ -2,8 +2,12 @@ from sanic_jwt import Initialize
 from aredis import StrictRedis
 from jogging.Routes.auth import (
     authenticate,
+    store_refresh_token,
+    retrieve_refresh_token,
+    retrieve_user,
 )
 from jogging.Routes.users import register
+from jogging.Routes.jogging_results import add_jogging_result
 from jogging import config
 
 
@@ -19,28 +23,33 @@ def config_app():
     Initialize(
         config.app,
         authenticate=authenticate,
-        #       refresh_token_enabled=True,
-        #       store_refresh_token=store_refresh_token,
-        #       retrieve_refresh_token=retrieve_refresh_token,
+        store_refresh_token=store_refresh_token,
+        retrieve_refresh_token=retrieve_refresh_token,
+        retrieve_user=retrieve_user,
         debug=True,
         claim_iat=True,
+        refresh_token_enabled=True,
         #        scopes_enabled=True,
-        expiration_delta=60 * 10,
     )
 
     #
     # user routes
     #
     config.app.add_route(register, "/users", methods=["POST"])
+    # config.app.add_route(change_user_role, "/users/<userId>", methods=["PATCH"])
+    # config.app.add_route(get_user_role, "/users/<userId>", methods=["GET"])
+    # config.app.add_route(expire_user, "/users/<userId>", methods=["DELETE"])
+
+    #
     # jogging routes
     #
-    # register Idea routes
-    #
-    # config.app.add_route(update_idea, "/ideas/<id>", methods=["PUT"])
-    # config.app.add_route(delete_idea, "/ideas/<id>", methods=["DELETE"])
-    # config.app.add_route(create_idea, "/ideas", methods=["POST"])
-    # config.app.add_route(get_ideas, "/ideas", methods=["GET"])
-    # config.app.add_route(me_me_me, "/me", methods=["GET"])
+    config.app.add_route(
+        add_jogging_result, "/results", methods=["POST"]
+    )
+    # config.app.add_route(update_jogging_result, "/results/<resultId>", methods=["PATCH"])
+    # config.app.add_route(delete_jogging_result, "/results/<resultId>", methods=["DELETE"])
+    # config.app.add_route(get_jogging_result, "/results/<resultId>", methods=["GET"])
+    # config.app.add_route(jogging_report, "/results", methods=["GET"])
 
 
 if __name__ == "__main__":

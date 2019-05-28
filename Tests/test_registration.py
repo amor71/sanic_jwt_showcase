@@ -41,18 +41,20 @@ async def test_negative_register_no_payload(test_cli):
     resp = await test_cli.post("/users")
     assert resp.status == 400
 
+
 async def test_negative_register_partial_payload(test_cli):
     data = {"username": username}
     resp = await test_cli.post("/users", data=json.dumps(data))
     assert resp.status == 400
+
 
 async def test_negative_register_password_missing_minimal_req(test_cli):
     data = {"username": username, "password": "1234"}
     resp = await test_cli.post("/users", data=json.dumps(data))
     assert resp.status == 400
 
+
 async def test_negative_register_already_exists(test_cli):
     data = {"username": username, "password": "testing123G"}
     resp = await test_cli.post("/users", data=json.dumps(data))
     assert resp.status == 409
-

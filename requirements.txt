@@ -1,8 +1,8 @@
 sanic
-marshmallow<3.0
 pysqlite3
 sqlalchemy
 sanic_jwt
 bcrypt
 aredis
 pytest-sanic
+darkskylib

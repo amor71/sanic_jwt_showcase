@@ -41,15 +41,15 @@ class User(object):
         connection.close()
 
     @classmethod
-    def get_by_username(cls, email):
+    def get_by_username(cls, username):
         assert engine
         s = text(
-            "SELECT user_id, user_name, hash_password, roll_id "
+            "SELECT user_id, username, hashed_password, roll_id "
             "FROM users "
-            "WHERE username = :email AND expire_date is null"
+            "WHERE username = :username AND expire_date is null"
         )
         connection = engine.connect()
-        rc = connection.execute(s, email=email).fetchone()
+        rc = connection.execute(s, username=username).fetchone()
         if rc is not None:
             rc = User(rc[0], rc[1], rc[2].decode("utf-8"), rc[3])
 
@@ -73,6 +73,4 @@ class User(object):
             else True
         )
         connection.close()
-
-        print(f"username={username} exists={rc}")
         return rc

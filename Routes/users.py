@@ -19,7 +19,9 @@ async def register(request, *args, **kwargs):
         or "username" not in request.json
         or "password" not in request.json
     ):
-        raise InvalidUsage("missing JSON body")
+        raise InvalidUsage(
+            "invalid payload (should be {username, password})"
+        )
 
     password = request.json["password"]
     if not password_validator(password):

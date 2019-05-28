@@ -5,9 +5,7 @@ from jogging.Models.user import User
 
 
 async def authenticate(request, *args, **kwargs):
-    if (
-        request.json is None
-    ):
+    if request.json is None:
         raise exceptions.AuthenticationFailed("missing payload")
 
     username = request.json.get("username", None)
@@ -23,7 +21,7 @@ async def authenticate(request, *args, **kwargs):
         raise exceptions.AuthenticationFailed("User not found.")
 
     if not bcrypt.checkpw(
-        password.encode("utf-8"), user.hashed_password
+        password.encode("utf-8"), user.hashed_password.encode("utf-8")
     ):
         raise exceptions.AuthenticationFailed("Password is incorrect.")
 
@@ -46,19 +44,26 @@ def encrypt(password):
 
 async def store_refresh_token(user_id, refresh_token, *args, **kwargs):
     await config.redis_client.set(
-        f"user_id{user_id}", refresh_token
+        f"user_id:{user_id}", refresh_token
     )  # no TTL for this basic implementation
-    assert await config.redis_client.exists(f"user_id{user_id}") is True
-
-
-async def delete_refresh_token(user_id, refresh_token, *args, **kwargs):
-    key = f"user_id{user_id}"
-    if await config.redis_client.exists(key):
-        token = await config.redis_client.get(key)
-        if token == refresh_token.encode("utf-8"):
-            await config.redis_client.delete(key)
+    assert (
+        await config.redis_client.exists(f"user_id:{user_id}") is True
+    )
 
 
 async def retrieve_refresh_token(request, user_id, *args, **kwargs):
-    found_token = await config.redis_client.get(f"user_id{user_id}")
+    found_token = await config.redis_client.get(f"user_id:{user_id}")
     return found_token
+
+
+def retrieve_user(request, *args, **kwargs):
+    if "user_id" in kwargs:
+        user_id = kwargs.get("user_id")
+    else:
+        if "payload" in kwargs:
+            payload = kwargs.get("payload")
+        else:
+            payload = request.app.auth.extract_payload(request)
+        user_id = payload.get("user_id")
+
+    return {"user_id": user_id}
