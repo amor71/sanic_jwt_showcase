@@ -7,7 +7,10 @@ from jogging.Routes.auth import (
     retrieve_user,
 )
 from jogging.Routes.users import register
-from jogging.Routes.jogging_results import add_jogging_result
+from jogging.Routes.jogging_results import (
+    add_jogging_result,
+    get_jogging_results,
+)
 from jogging import config
 
 
@@ -43,12 +46,11 @@ def config_app():
     #
     # jogging routes
     #
-    config.app.add_route(
-        add_jogging_result, "/results", methods=["POST"]
-    )
+    config.app.add_route(add_jogging_result, "/results", methods=["POST"])
     # config.app.add_route(update_jogging_result, "/results/<resultId>", methods=["PATCH"])
     # config.app.add_route(delete_jogging_result, "/results/<resultId>", methods=["DELETE"])
     # config.app.add_route(get_jogging_result, "/results/<resultId>", methods=["GET"])
+    config.app.add_route(get_jogging_results, "/results", methods=["GET"])
     # config.app.add_route(jogging_report, "/results", methods=["GET"])
 
 

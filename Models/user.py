@@ -4,13 +4,7 @@ from .dbhelper import engine
 
 class User(object):
     def __init__(
-        self,
-        user_id,
-        username,
-        hashed_password,
-        roll_id=1,
-        *args,
-        **kwargs
+        self, user_id, username, hashed_password, roll_id=1, *args, **kwargs
     ):
         self.user_id = user_id
         self.username = username
@@ -68,8 +62,7 @@ class User(object):
 
         rc = (
             False
-            if connection.execute(s, username=username).fetchone()
-            is None
+            if connection.execute(s, username=username).fetchone() is None
             else True
         )
         connection.close()

@@ -1,9 +1,5 @@
 from sanic import response
-from sanic.exceptions import (
-    SanicException,
-    InvalidUsage,
-    add_status_code,
-)
+from sanic.exceptions import SanicException, InvalidUsage, add_status_code
 from jogging.Models.user import User
 from .auth import encrypt, password_validator
 
@@ -19,15 +15,11 @@ async def register(request, *args, **kwargs):
         or "username" not in request.json
         or "password" not in request.json
     ):
-        raise InvalidUsage(
-            "invalid payload (should be {username, password})"
-        )
+        raise InvalidUsage("invalid payload (should be {username, password})")
 
     password = request.json["password"]
     if not password_validator(password):
-        raise InvalidUsage(
-            "password does not match minimum requirements"
-        )
+        raise InvalidUsage("password does not match minimum requirements")
 
     username = request.json["username"]
     if User.username_exists(username):

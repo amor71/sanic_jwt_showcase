@@ -12,9 +12,7 @@ async def authenticate(request, *args, **kwargs):
     password = request.json.get("password", None)
 
     if not username or not password:
-        raise exceptions.AuthenticationFailed(
-            "Missing username or password."
-        )
+        raise exceptions.AuthenticationFailed("Missing username or password.")
 
     user = User.get_by_username(username)
     if user is None:
@@ -46,9 +44,7 @@ async def store_refresh_token(user_id, refresh_token, *args, **kwargs):
     await config.redis_client.set(
         f"user_id:{user_id}", refresh_token
     )  # no TTL for this basic implementation
-    assert (
-        await config.redis_client.exists(f"user_id:{user_id}") is True
-    )
+    assert await config.redis_client.exists(f"user_id:{user_id}") is True
 
 
 async def retrieve_refresh_token(request, user_id, *args, **kwargs):

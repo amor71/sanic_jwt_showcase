@@ -80,24 +80,75 @@ async def test_positive_jogging_result(test_cli):
     resp = await test_cli.post(
         "/results", headers=headers, data=json.dumps(data)
     )
-
     assert resp.status == 201
+
+
+async def test_positive_load_dataset(test_cli):
+    import csv
+    global access_token
+    global refresh_token
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    dsreader = csv.reader(open('jogging_dataset.csv'), delimiter=',')
+    for row in dsreader:
+        data = {
+            "date": row[0],
+            "location":row[1],
+            "time": int(row[2]),
+            "distance": int(row[3])
+        }
+        resp = await test_cli.post(
+            "/results", headers=headers, data=json.dumps(data)
+        )
+        assert resp.status == 201
 
 
 async def test_negative_jogging_result_no_uath(test_cli):
     global access_token
     global refresh_token
-    headers = {"Authorization": f"Bearer {access_token}"}
     data = {
         "date": "2015-06-20",
         "distance": 2000,
         "time": 405,
         "location": "32.0853 34.7818",
     }
-    resp = await test_cli.post(
-        "/results", data=json.dumps(data)
-    )
-    resp_json = await resp.json()
-    print(resp_json)
-
+    resp = await test_cli.post("/results", data=json.dumps(data))
     assert resp.status == 400
+
+
+async def test_positive_get_all_results(test_cli):
+    global access_token
+    global refresh_token
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    resp = await test_cli.get("/results", headers=headers)
+    resp_json = await resp.json()
+
+    assert resp.status == 200
+
+async def test_positive_get_paging(test_cli):
+    global access_token
+    global refresh_token
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    resp = await test_cli.get("/results?page=0&count=2", headers=headers)
+    resp_json = await resp.json()
+    assert resp.status == 200
+    assert(len(resp_json) == 2)
+
+    resp = await test_cli.get("/results?page=1&count=1", headers=headers)
+    resp_json = await resp.json()
+    assert resp.status == 200
+    assert(len(resp_json) == 1)
+
+async def test_negative_bad_paging(test_cli):
+    global access_token
+    global refresh_token
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    resp = await test_cli.get("/results?page=-1&count=2", headers=headers)
+    assert resp.status == 400
+
+    resp = await test_cli.get("/results?page=1&count=0", headers=headers)
+    assert resp.status == 400
+
