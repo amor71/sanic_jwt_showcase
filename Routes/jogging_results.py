@@ -1,4 +1,5 @@
 import datetime
+import json
 from sanic import response
 from sanic.exceptions import (
     SanicException,
@@ -7,6 +8,8 @@ from sanic.exceptions import (
 )
 from sanic_jwt.decorators import protected
 from jogging.Contectors.darksky import get_weather_condition
+from jogging.Routes.auth import retrieve_user
+from jogging.Models.jogging_result import JoggingResult
 
 
 @add_status_code(409)
@@ -71,4 +74,16 @@ async def add_jogging_result(request, *args, **kwargs):
             "can't fetch running conditions for that location & time"
         )
 
-    return response.json(condition, status=200)
+    user_id = retrieve_user(request, args, kwargs)["user_id"]
+
+    jog = JoggingResult(
+        user_id,
+        request.json["location"],
+        date,
+        distance,
+        time,
+        json.dumps(condition['data'][0]),
+    )
+    jog.save()
+
+    return response.HTTPResponse(status=201)
