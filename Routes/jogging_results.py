@@ -91,9 +91,7 @@ async def get_jogging_results(request, *args, **kwargs):
     limit = int(request.args["count"][0]) if "count" in request.args else 10
 
     if page < 0 or limit <= 0:
-        raise InvalidUsage(
-            "invalid paging (page >= 0 and count > 0)"
-        )
+        raise InvalidUsage("invalid paging (page >= 0 and count > 0)")
 
     q_filter = request.args["filter"][0] if "filter" in request.args else None
     user_id = retrieve_user(request, args, kwargs)["user_id"]

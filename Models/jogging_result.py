@@ -54,15 +54,17 @@ class JoggingResult(object):
         )
 
         if q_filter:
-            q_filter.replace("eq", "=").replace("ne", "!=").replace(
-                "gt", ">="
-            ).replace("lt", "<=").replace("distance", "running_distance")
-            s += f" AND {q_filter}"
+            q_filter = (
+                q_filter.replace("eq", "=")
+                .replace("ne", "!=")
+                .replace("gt", ">=")
+                .replace("lt", "<=")
+                .replace("distance", "running_distance")
+            )
+            s += f" AND ({q_filter})"
 
         s += " ORDER BY date(date) LIMIT :limit OFFSET :page"
 
-        print(s)
-        print(user_id, limit, page)
         connection = engine.connect()
         q_result = connection.execute(
             text(s), user_id=user_id, limit=limit, page=page
@@ -70,12 +72,13 @@ class JoggingResult(object):
 
         rc = (
             [
-                JoggingResult(user_id, row[0], row[1], row[2], row[3], row[4]).__dict__()
+                JoggingResult(
+                    user_id, row[0], row[1], row[2], row[3], row[4]
+                ).__dict__()
                 for row in q_result
             ]
             if q_result is not None
             else []
         )
-        print(rc)
         connection.close()
         return rc

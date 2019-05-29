@@ -85,17 +85,18 @@ async def test_positive_jogging_result(test_cli):
 
 async def test_positive_load_dataset(test_cli):
     import csv
+
     global access_token
     global refresh_token
     headers = {"Authorization": f"Bearer {access_token}"}
 
-    dsreader = csv.reader(open('jogging_dataset.csv'), delimiter=',')
+    dsreader = csv.reader(open("jogging_dataset.csv"), delimiter=",")
     for row in dsreader:
         data = {
             "date": row[0],
-            "location":row[1],
-            "time": int(row[2]),
-            "distance": int(row[3])
+            "location": row[1],
+            "distance": int(row[2]),
+            "time": int(row[3]),
         }
         resp = await test_cli.post(
             "/results", headers=headers, data=json.dumps(data)
@@ -126,6 +127,7 @@ async def test_positive_get_all_results(test_cli):
 
     assert resp.status == 200
 
+
 async def test_positive_get_paging(test_cli):
     global access_token
     global refresh_token
@@ -134,12 +136,13 @@ async def test_positive_get_paging(test_cli):
     resp = await test_cli.get("/results?page=0&count=2", headers=headers)
     resp_json = await resp.json()
     assert resp.status == 200
-    assert(len(resp_json) == 2)
+    assert len(resp_json) == 2
 
     resp = await test_cli.get("/results?page=1&count=1", headers=headers)
     resp_json = await resp.json()
     assert resp.status == 200
-    assert(len(resp_json) == 1)
+    assert len(resp_json) == 1
+
 
 async def test_negative_bad_paging(test_cli):
     global access_token
@@ -152,3 +155,38 @@ async def test_negative_bad_paging(test_cli):
     resp = await test_cli.get("/results?page=1&count=0", headers=headers)
     assert resp.status == 400
 
+
+async def test_positive_check_filters(test_cli):
+    global access_token
+    global refresh_token
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    resp = await test_cli.get(
+        "/results?page=0&count=2&filter=date eq '2019-07-15'", headers=headers
+    )
+    resp_json = await resp.json()
+    assert resp.status == 200
+    assert len(resp_json) == 1
+
+    resp = await test_cli.get(
+        "/results?filter=(date lt '2018-01-01') AND (time lt 500)",
+        headers=headers,
+    )
+    resp_json = await resp.json()
+    assert resp.status == 200
+    assert len(resp_json) == 4
+
+    resp = await test_cli.get(
+        "/results?filter=distance ne 2000", headers=headers
+    )
+    resp_json = await resp.json()
+    assert resp.status == 200
+    assert len(resp_json) == 8
+
+    resp = await test_cli.get(
+        "/results?filter=distance ne 2000 and ((time lt 400) and (time gt 390))",
+        headers=headers,
+    )
+    resp_json = await resp.json()
+    assert resp.status == 200
+    assert len(resp_json) == 0
