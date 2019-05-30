@@ -1,10 +1,13 @@
 import json
 from sqlalchemy.sql import text
+from sqlalchemy.exc import OperationalError
 from .dbhelper import engine
 
 
 class JoggingResult(object):
-    def __init__(self, user_id, location, date, distance, time, condition):
+    def __init__(
+        self, user_id, location, date, distance, time, condition
+    ):
         self.user_id = user_id
         self.location = location
         self.date = date
@@ -45,7 +48,9 @@ class JoggingResult(object):
         connection.close()
 
     @classmethod
-    def load(cls, user_id: int, q_filter: str, page: int, limit: int) -> list:
+    def load(
+        cls, user_id: int, q_filter: str, page: int, limit: int
+    ) -> list:
         assert engine
         s = (
             "SELECT location, date, running_distance, time, condition "
@@ -60,15 +65,19 @@ class JoggingResult(object):
                 .replace("gt", ">=")
                 .replace("lt", "<=")
                 .replace("distance", "running_distance")
+                .replace(";", "")
             )
             s += f" AND ({q_filter})"
 
         s += " ORDER BY date(date) LIMIT :limit OFFSET :page"
 
         connection = engine.connect()
-        q_result = connection.execute(
-            text(s), user_id=user_id, limit=limit, page=page
-        ).fetchall()
+        try:
+            q_result = connection.execute(
+                text(s), user_id=user_id, limit=limit, page=page
+            ).fetchall()
+        except OperationalError as e:
+            raise (e)
 
         rc = (
             [

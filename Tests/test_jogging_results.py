@@ -133,12 +133,16 @@ async def test_positive_get_paging(test_cli):
     global refresh_token
     headers = {"Authorization": f"Bearer {access_token}"}
 
-    resp = await test_cli.get("/results?page=0&count=2", headers=headers)
+    resp = await test_cli.get(
+        "/results?page=0&count=2", headers=headers
+    )
     resp_json = await resp.json()
     assert resp.status == 200
     assert len(resp_json) == 2
 
-    resp = await test_cli.get("/results?page=1&count=1", headers=headers)
+    resp = await test_cli.get(
+        "/results?page=1&count=1", headers=headers
+    )
     resp_json = await resp.json()
     assert resp.status == 200
     assert len(resp_json) == 1
@@ -149,10 +153,26 @@ async def test_negative_bad_paging(test_cli):
     global refresh_token
     headers = {"Authorization": f"Bearer {access_token}"}
 
-    resp = await test_cli.get("/results?page=-1&count=2", headers=headers)
+    resp = await test_cli.get(
+        "/results?page=-1&count=2", headers=headers
+    )
     assert resp.status == 400
 
-    resp = await test_cli.get("/results?page=1&count=0", headers=headers)
+    resp = await test_cli.get(
+        "/results?page=1&count=0", headers=headers
+    )
+    assert resp.status == 400
+
+
+async def test_negative_sql_injection(test_cli):
+    global access_token
+    global refresh_token
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    resp = await test_cli.get(
+        "/results?page=0&count=2&filter=%3Bdrop table users%3B",
+        headers=headers,
+    )
     assert resp.status == 400
 
 
@@ -162,7 +182,8 @@ async def test_positive_check_filters(test_cli):
     headers = {"Authorization": f"Bearer {access_token}"}
 
     resp = await test_cli.get(
-        "/results?page=0&count=2&filter=date eq '2019-07-15'", headers=headers
+        "/results?page=0&count=2&filter=date eq '2019-07-15'",
+        headers=headers,
     )
     resp_json = await resp.json()
     assert resp.status == 200

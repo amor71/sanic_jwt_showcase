@@ -96,6 +96,9 @@ async def get_jogging_results(request, *args, **kwargs):
     q_filter = request.args["filter"][0] if "filter" in request.args else None
     user_id = retrieve_user(request, args, kwargs)["user_id"]
 
-    return response.json(
-        JoggingResult.load(user_id, q_filter, page, limit), status=200
-    )
+    try:
+        rc = JoggingResult.load(user_id, q_filter, page, limit)
+    except Exception as e:
+        raise InvalidUsage(e)
+
+    return response.json(rc, status=200)
