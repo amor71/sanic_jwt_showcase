@@ -58,16 +58,22 @@ async def test_negative_register_already_exists(test_cli):
     resp = await test_cli.post("/users", data=json.dumps(data))
     assert resp.status == 409
 
+
 async def test_positive_register_w_email_and_name(test_cli):
     global username
-    username=None
+    username = None
     while username is None:
         i = random.randint(1, 10000)
         username = f"amichay.oren+{i}@gmail.com"
         if User.username_exists(username):
             username = None
 
-    data = {"username": username, "password": "testing123G", "email": username, "name": "Amichay Oren"}
+    data = {
+        "username": username,
+        "password": "testing123G",
+        "email": username,
+        "name": "Amichay Oren",
+    }
     resp = await test_cli.post("/users", data=json.dumps(data))
 
     assert resp.status == 201
@@ -87,7 +93,7 @@ async def test_positive_register_w_email_and_name(test_cli):
 
 async def test_positive_register_w_email(test_cli):
     global username
-    username=None
+    username = None
     while username is None:
         i = random.randint(1, 10000)
         username = f"amichay.oren+{i}@gmail.com"
@@ -101,14 +107,18 @@ async def test_positive_register_w_email(test_cli):
 
 async def test_positive_register_w_random_username(test_cli):
     global username
-    username=None
+    username = None
     while username is None:
         i = random.randint(1, 10000)
         username = f"{i}"
         if User.username_exists(username):
             username = None
 
-    data = {"username": username, "password": "testing123G", "email": 'amichay@gmail.com'}
+    data = {
+        "username": username,
+        "password": "testing123G",
+        "email": "amichay@gmail.com",
+    }
     resp = await test_cli.post("/users", data=json.dumps(data))
     assert resp.status == 201
 

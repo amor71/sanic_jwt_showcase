@@ -6,7 +6,8 @@ from jogging.Routes.auth import (
     retrieve_refresh_token,
     retrieve_user,
     EmailClaim,
-    NameClaim
+    NameClaim,
+    scope_extender
 )
 from jogging.Routes.users import register
 from jogging.Routes.jogging_results import (
@@ -33,11 +34,10 @@ def config_app():
         store_refresh_token=store_refresh_token,
         retrieve_refresh_token=retrieve_refresh_token,
         retrieve_user=retrieve_user,
+        add_scopes_to_payload=scope_extender,
         debug=True,
         claim_iat=True,
         refresh_token_enabled=True,
-
-        #        scopes_enabled=True,
     )
 
     #

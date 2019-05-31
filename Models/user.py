@@ -1,3 +1,4 @@
+import json
 from sqlalchemy.sql import text
 from .dbhelper import engine
 
@@ -8,35 +9,35 @@ class User(object):
         user_id,
         username,
         hashed_password,
+        scopes,
         email=None,
         name=None,
-        roll_id=1,
         *args,
         **kwargs
     ):
         self.user_id = user_id
         self.username = username
         self.hashed_password = hashed_password
-        self.roll_id = roll_id
+        self.scopes = scopes
         self.email = email
         self.name = name
 
     def to_dict(self):
-        return {"user_id": self.user_id, "username": self.username}
+        return {"user_id": self.user_id, "username": self.username, "scopes": self.scopes}
 
     def save(self):
         connection = engine.connect()
         trans = connection.begin()
         try:
             s = text(
-                "INSERT INTO users(username, hashed_password, roll_id, name, email) "
-                "VALUES(:username, :hashed_password, :roll_id, :name, :email)"
+                "INSERT INTO users(username, hashed_password, scopes, name, email) "
+                "VALUES(:username, :hashed_password, :scopes, :name, :email)"
             )
             connection.execute(
                 s,
                 username=self.username,
                 hashed_password=self.hashed_password,
-                roll_id=self.roll_id,
+                scopes=json.dumps(self.scopes),
                 name=self.name,
                 email=self.email
             )
@@ -50,14 +51,30 @@ class User(object):
     def get_by_username(cls, username):
         assert engine
         s = text(
-            "SELECT user_id, username, hashed_password, roll_id, email, name "
+            "SELECT user_id, username, hashed_password, scopes, email, name "
             "FROM users "
             "WHERE username = :username AND expire_date is null"
         )
         connection = engine.connect()
         rc = connection.execute(s, username=username).fetchone()
         if rc is not None:
-            rc = User(rc[0], rc[1], rc[2].decode("utf-8"), rc[4], rc[5], rc[3])
+            rc = User(rc[0], rc[1], rc[2].decode("utf-8"), json.loads(rc[3]), rc[4], rc[5])
+
+        connection.close()
+        return rc
+
+    @classmethod
+    def get_by_user_id(cls, user_id):
+        assert engine
+        s = text(
+            "SELECT user_id, username, hashed_password, scopes, email, name "
+            "FROM users "
+            "WHERE user_id = :user_id"
+        )
+        connection = engine.connect()
+        rc = connection.execute(s, user_id=user_id).fetchone()
+        if rc is not None:
+            rc = User(rc[0], rc[1], rc[2].decode("utf-8"), json.loads(rc[3]), rc[4], rc[5])
 
         connection.close()
         return rc

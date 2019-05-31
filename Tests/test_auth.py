@@ -32,7 +32,12 @@ def test_cli(loop, app, sanic_client):
 
 
 async def test_positive_register_(test_cli):
-    data = {"username": username, "password": "testing123G"}
+    data = {
+        "username": username,
+        "password": "testing123G",
+        "name": "Amichay Oren",
+        "email": username,
+    }
     resp = await test_cli.post("/users", data=json.dumps(data))
     assert resp.status == 201
 
@@ -50,6 +55,16 @@ async def test_positive_login(test_cli):
     assert refresh_token is not None
     assert resp.status == 200
 
+async def test_positive_me(test_cli):
+    global access_token
+    global refresh_token
+
+    print(access_token)
+    headers = {"Authorization": f"Bearer {access_token}"}
+    resp = await test_cli.get("/auth/me", headers=headers)
+    resp_json = await resp.json()
+    print(resp_json)
+    assert resp.status == 200
 
 async def test_positive_validate(test_cli):
     global access_token
@@ -71,6 +86,7 @@ async def test_positive_refresh_token(test_cli):
     global access_token
     global refresh_token
     data = {"refresh_token": refresh_token}
+    print(access_token)
     headers = {"Authorization": f"Bearer {access_token}"}
     resp = await test_cli.post(
         "/auth/refresh", headers=headers, data=json.dumps(data)
@@ -79,4 +95,15 @@ async def test_positive_refresh_token(test_cli):
     print(resp_json)
     access_token = resp_json["access_token"]
     assert access_token is not None
+    assert resp.status == 200
+
+
+async def test_positive_me2(test_cli):
+    global access_token
+    global refresh_token
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+    resp = await test_cli.get("/auth/me", headers=headers)
+    resp_json = await resp.json()
+    print(resp_json)
     assert resp.status == 200

@@ -70,7 +70,7 @@ async def add_jogging_result(request, *args, **kwargs):
             "can't fetch running conditions for that location & time"
         )
 
-    user_id = retrieve_user(request, args, kwargs)["user_id"]
+    user_id = retrieve_user(request, args, kwargs).user_id
 
     jog = JoggingResult(
         user_id,
@@ -94,7 +94,7 @@ async def get_jogging_results(request, *args, **kwargs):
         raise InvalidUsage("invalid paging (page >= 0 and count > 0)")
 
     q_filter = request.args["filter"][0] if "filter" in request.args else None
-    user_id = retrieve_user(request, args, kwargs)["user_id"]
+    user_id = retrieve_user(request, args, kwargs).user_id
 
     try:
         rc = JoggingResult.load(user_id, q_filter, page, limit)

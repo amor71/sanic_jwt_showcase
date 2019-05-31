@@ -1,18 +1,9 @@
-CREATE TABLE IF NOT EXISTS roles(
-  role_id INT NOT NULL PRIMARY KEY,
-  description TEXT NOT NULL
-);
-
-insert into roles (role_id, description) values (1, "user");
-insert into roles (role_id, description) values (10, "user manager");
-insert into roles (role_id, description) values (100, "user manager");
-
 CREATE TABLE IF NOT EXISTS users(
   user_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   username TEXT NOT NULL,
   email TEXT,
   name TEXT,
-  roll_id INT DEFAULT 1 REFERENCES roles(role_id),
+  scopes TEXT NOT NULL,
   hashed_password TEXT NOT NULL,
   create_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   expire_date TIMESTAMP

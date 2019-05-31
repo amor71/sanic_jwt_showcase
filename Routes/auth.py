@@ -42,6 +42,9 @@ def encrypt(password):
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt(14))
 
 
+async def scope_extender(user, *args, **kwargs):
+    return user.scopes
+
 #
 # Token Management
 #
@@ -67,7 +70,8 @@ def retrieve_user(request, *args, **kwargs):
             payload = request.app.auth.extract_payload(request)
         user_id = payload.get("user_id")
 
-    return {"user_id": user_id}
+    return User.get_by_user_id(user_id)
+
 
 
 #

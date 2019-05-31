@@ -27,7 +27,7 @@ async def register(request, *args, **kwargs):
 
     email = request.json["email"] if "email" in request.json else None
     name = request.json["name"] if "name" in request.json else None
-    user = User(None, username, encrypt(request.json["password"]), email, name)
+    user = User(None, username, encrypt(request.json["password"]), ["user"], email, name)
     user.save()
 
     return response.HTTPResponse(status=201)
