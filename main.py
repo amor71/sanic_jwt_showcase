@@ -5,6 +5,8 @@ from jogging.Routes.auth import (
     store_refresh_token,
     retrieve_refresh_token,
     retrieve_user,
+    EmailClaim,
+    NameClaim
 )
 from jogging.Routes.users import register
 from jogging.Routes.jogging_results import (
@@ -23,15 +25,18 @@ def config_app():
     #
     # sanic_jwt configuration & setup
     #
+    custom_claims = [NameClaim, EmailClaim]
     Initialize(
         config.app,
         authenticate=authenticate,
+        custom_claims=custom_claims,
         store_refresh_token=store_refresh_token,
         retrieve_refresh_token=retrieve_refresh_token,
         retrieve_user=retrieve_user,
         debug=True,
         claim_iat=True,
         refresh_token_enabled=True,
+
         #        scopes_enabled=True,
     )
 

@@ -69,7 +69,20 @@ async def test_positive_register_w_email_and_name(test_cli):
 
     data = {"username": username, "password": "testing123G", "email": username, "name": "Amichay Oren"}
     resp = await test_cli.post("/users", data=json.dumps(data))
+
     assert resp.status == 201
+
+    data = {"username": username, "password": "testing123G"}
+    resp = await test_cli.post("/auth", data=json.dumps(data))
+    resp_json = await resp.json()
+    print(resp_json)
+    global access_token
+    access_token = resp_json["access_token"]
+    global refresh_token
+    refresh_token = resp_json["refresh_token"]
+    assert access_token is not None
+    assert refresh_token is not None
+    assert resp.status == 200
 
 
 async def test_positive_register_w_email(test_cli):
@@ -95,6 +108,18 @@ async def test_positive_register_w_random_username(test_cli):
         if User.username_exists(username):
             username = None
 
-    data = {"username": username, "password": "testing123G", "email": username}
+    data = {"username": username, "password": "testing123G", "email": 'amichay@gmail.com'}
     resp = await test_cli.post("/users", data=json.dumps(data))
     assert resp.status == 201
+
+    data = {"username": username, "password": "testing123G"}
+    resp = await test_cli.post("/auth", data=json.dumps(data))
+    resp_json = await resp.json()
+    print(resp_json)
+    global access_token
+    access_token = resp_json["access_token"]
+    global refresh_token
+    refresh_token = resp_json["refresh_token"]
+    assert access_token is not None
+    assert refresh_token is not None
+    assert resp.status == 200

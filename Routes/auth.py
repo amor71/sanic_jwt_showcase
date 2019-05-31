@@ -1,9 +1,11 @@
 import bcrypt
-from sanic_jwt import exceptions
+from sanic_jwt import exceptions, Claim
 from jogging import config
 from jogging.Models.user import User
 
-
+#
+# Authentication Management
+#
 async def authenticate(request, *args, **kwargs):
     if request.json is None:
         raise exceptions.AuthenticationFailed("missing payload")
@@ -40,6 +42,9 @@ def encrypt(password):
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt(14))
 
 
+#
+# Token Management
+#
 async def store_refresh_token(user_id, refresh_token, *args, **kwargs):
     await config.redis_client.set(
         f"user_id:{user_id}", refresh_token
@@ -63,3 +68,30 @@ def retrieve_user(request, *args, **kwargs):
         user_id = payload.get("user_id")
 
     return {"user_id": user_id}
+
+
+#
+# Custom Claims
+#
+class NameClaim(Claim):
+    key = "name"
+
+    def setup(self, payload, user):
+        return user.name if hasattr(user, 'name') else None
+
+    def verify(self, value):
+        return True
+
+
+class EmailClaim(Claim):
+    key = "email"
+
+    def setup(self, payload, user):
+        return user.email if hasattr(user, 'email') else None
+
+    def verify(self, value):
+        return True
+
+
+
+
