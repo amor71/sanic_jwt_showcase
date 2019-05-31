@@ -8,6 +8,8 @@ class User(object):
         user_id,
         username,
         hashed_password,
+        email=None,
+        name=None,
         roll_id=1,
         *args,
         **kwargs
@@ -16,6 +18,8 @@ class User(object):
         self.username = username
         self.hashed_password = hashed_password
         self.roll_id = roll_id
+        self.email = email
+        self.name = name
 
     def to_dict(self):
         return {"user_id": self.user_id, "username": self.username}
@@ -25,14 +29,16 @@ class User(object):
         trans = connection.begin()
         try:
             s = text(
-                "INSERT INTO users(username, hashed_password, roll_id) "
-                "VALUES(:username, :hashed_password, :roll_id)"
+                "INSERT INTO users(username, hashed_password, roll_id, name, email) "
+                "VALUES(:username, :hashed_password, :roll_id, :name, :email)"
             )
             connection.execute(
                 s,
                 username=self.username,
                 hashed_password=self.hashed_password,
                 roll_id=self.roll_id,
+                name=self.name,
+                email=self.email
             )
             trans.commit()
         except:
@@ -44,14 +50,14 @@ class User(object):
     def get_by_username(cls, username):
         assert engine
         s = text(
-            "SELECT user_id, username, hashed_password, roll_id "
+            "SELECT user_id, username, hashed_password, roll_id, email, name "
             "FROM users "
             "WHERE username = :username AND expire_date is null"
         )
         connection = engine.connect()
         rc = connection.execute(s, username=username).fetchone()
         if rc is not None:
-            rc = User(rc[0], rc[1], rc[2].decode("utf-8"), rc[3])
+            rc = User(rc[0], rc[1], rc[2].decode("utf-8"), rc[3], rc[4], rc[5])
 
         connection.close()
         return rc

@@ -10,6 +10,8 @@ insert into roles (role_id, description) values (100, "user manager");
 CREATE TABLE IF NOT EXISTS users(
   user_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   username TEXT NOT NULL,
+  email TEXT,
+  name TEXT,
   roll_id INT DEFAULT 1 REFERENCES roles(role_id),
   hashed_password TEXT NOT NULL,
   create_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

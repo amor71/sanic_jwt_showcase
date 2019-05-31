@@ -25,7 +25,9 @@ async def register(request, *args, **kwargs):
     if User.username_exists(username):
         raise Conflict(f"username {username} already exists")
 
-    user = User(None, username, encrypt(request.json["password"]))
+    email = request.json["email"] if "email" in request.json else None
+    name = request.json["name"] if "name" in request.json else None
+    user = User(None, username, encrypt(request.json["password"]), email, name)
     user.save()
 
     return response.HTTPResponse(status=201)

@@ -20,7 +20,6 @@ def app():
 
 @pytest.fixture
 def test_cli(loop, app, sanic_client):
-
     global username
     while username is None:
         i = random.randint(1, 10000)
@@ -58,3 +57,44 @@ async def test_negative_register_already_exists(test_cli):
     data = {"username": username, "password": "testing123G"}
     resp = await test_cli.post("/users", data=json.dumps(data))
     assert resp.status == 409
+
+async def test_positive_register_w_email_and_name(test_cli):
+    global username
+    username=None
+    while username is None:
+        i = random.randint(1, 10000)
+        username = f"amichay.oren+{i}@gmail.com"
+        if User.username_exists(username):
+            username = None
+
+    data = {"username": username, "password": "testing123G", "email": username, "name": "Amichay Oren"}
+    resp = await test_cli.post("/users", data=json.dumps(data))
+    assert resp.status == 201
+
+
+async def test_positive_register_w_email(test_cli):
+    global username
+    username=None
+    while username is None:
+        i = random.randint(1, 10000)
+        username = f"amichay.oren+{i}@gmail.com"
+        if User.username_exists(username):
+            username = None
+
+    data = {"username": username, "password": "testing123G", "email": username}
+    resp = await test_cli.post("/users", data=json.dumps(data))
+    assert resp.status == 201
+
+
+async def test_positive_register_w_random_username(test_cli):
+    global username
+    username=None
+    while username is None:
+        i = random.randint(1, 10000)
+        username = f"{i}"
+        if User.username_exists(username):
+            username = None
+
+    data = {"username": username, "password": "testing123G", "email": username}
+    resp = await test_cli.post("/users", data=json.dumps(data))
+    assert resp.status == 201
