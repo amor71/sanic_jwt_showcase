@@ -55,6 +55,7 @@ async def test_positive_login(test_cli):
     assert refresh_token is not None
     assert resp.status == 200
 
+
 async def test_positive_me(test_cli):
     global access_token
     global refresh_token
@@ -65,6 +66,7 @@ async def test_positive_me(test_cli):
     resp_json = await resp.json()
     print(resp_json)
     assert resp.status == 200
+
 
 async def test_positive_validate(test_cli):
     global access_token

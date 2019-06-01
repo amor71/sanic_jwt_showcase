@@ -7,9 +7,14 @@ from jogging.Routes.auth import (
     retrieve_user,
     EmailClaim,
     NameClaim,
-    scope_extender
+    scope_extender,
 )
-from jogging.Routes.users import register
+from jogging.Routes.users import (
+    register,
+    get_users,
+    update_user,
+    update_user_scope,
+)
 from jogging.Routes.jogging_results import (
     add_jogging_result,
     get_jogging_results,
@@ -44,10 +49,11 @@ def config_app():
     # user routes
     #
     config.app.add_route(register, "/users", methods=["POST"])
-    # config.app.add_route(change_user_role, "/users/<userId>", methods=["PATCH"])
-    # config.app.add_route(get_user_role, "/users/<userId>", methods=["GET"])
-    # config.app.add_route(expire_user, "/users/<userId>", methods=["DELETE"])
-
+    config.app.add_route(get_users, "/users", methods=["GET"])
+    config.app.add_route(
+        update_user_scope, "/users/<userId>/scopes", methods=["PATCH"]
+    )
+    config.app.add_route(update_user, "/users/<userId>", methods=["PATCH"])
     #
     # jogging routes
     #

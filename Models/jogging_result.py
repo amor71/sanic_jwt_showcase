@@ -5,9 +5,7 @@ from .dbhelper import engine
 
 
 class JoggingResult(object):
-    def __init__(
-        self, user_id, location, date, distance, time, condition
-    ):
+    def __init__(self, user_id, location, date, distance, time, condition):
         self.user_id = user_id
         self.location = location
         self.date = date
@@ -48,9 +46,7 @@ class JoggingResult(object):
         connection.close()
 
     @classmethod
-    def load(
-        cls, user_id: int, q_filter: str, page: int, limit: int
-    ) -> list:
+    def load(cls, user_id: int, q_filter: str, page: int, limit: int) -> list:
         assert engine
         s = (
             "SELECT location, date, running_distance, time, condition "

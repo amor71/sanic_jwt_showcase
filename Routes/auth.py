@@ -45,6 +45,7 @@ def encrypt(password):
 async def scope_extender(user, *args, **kwargs):
     return user.scopes
 
+
 #
 # Token Management
 #
@@ -73,7 +74,6 @@ def retrieve_user(request, *args, **kwargs):
     return User.get_by_user_id(user_id)
 
 
-
 #
 # Custom Claims
 #
@@ -81,7 +81,7 @@ class NameClaim(Claim):
     key = "name"
 
     def setup(self, payload, user):
-        return user.name if hasattr(user, 'name') else None
+        return user.name if hasattr(user, "name") else None
 
     def verify(self, value):
         return True
@@ -91,11 +91,7 @@ class EmailClaim(Claim):
     key = "email"
 
     def setup(self, payload, user):
-        return user.email if hasattr(user, 'email') else None
+        return user.email if hasattr(user, "email") else None
 
     def verify(self, value):
         return True
-
-
-
-

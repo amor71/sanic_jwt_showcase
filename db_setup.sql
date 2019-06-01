@@ -6,7 +6,10 @@ CREATE TABLE IF NOT EXISTS users(
   scopes TEXT NOT NULL,
   hashed_password TEXT NOT NULL,
   create_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  expire_date TIMESTAMP
+  expire_date TIMESTAMP,
+  modify_user_id INT REFERENCES users(modify_user_id),
+  modified_at TIMESTAMP
+
 );
 CREATE INDEX IF NOT EXISTS users_idx ON users (username, expire_date);
 
@@ -23,5 +26,6 @@ CREATE TABLE IF NOT EXISTS jogging_results(
   modify_user_id INT REFERENCES users(modify_user_id),
   modified_at TIMESTAMP
 );
+
 
 
