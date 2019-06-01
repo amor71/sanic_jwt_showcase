@@ -12,7 +12,7 @@ class User(object):
         scopes,
         email,
         name=None,
-        exists=False
+        exists=False,
     ):
         self.user_id = user_id
         self.username = username
@@ -31,7 +31,6 @@ class User(object):
             "email": self.email,
             "scopes": self.scopes,
         }
-
 
     def __str__(self):
         return json.dumps(self.to_dict())
@@ -116,7 +115,7 @@ class User(object):
                 modifying_user_id if modifying_user_id else self.user_id
             )
 
-    def get_users(self, page: int, limit:int) -> list:
+    def get_users(self, page: int, limit: int) -> list:
         assert engine
         connection = engine.connect()
         rc = []
@@ -129,24 +128,23 @@ class User(object):
             s += " ORDER BY date(create_date) LIMIT :limit OFFSET :page"
 
             q_result = connection.execute(
-                text(s),
-                scopes=json.dumps(["user"]),
-                page=page,
-                limit=limit,
+                text(s), scopes=json.dumps(["user"]), page=page, limit=limit
             ).fetchall()
 
             print(s, json.dumps(["user"]))
             if q_result:
                 for row in q_result:
-                    rc.append(User(
-                        row[0],
-                        row[1],
-                        row[2].decode("utf-8"),
-                        json.loads(row[3]),
-                        row[4],
-                        row[5],
-                        True,
-                    ))
+                    rc.append(
+                        User(
+                            row[0],
+                            row[1],
+                            row[2].decode("utf-8"),
+                            json.loads(row[3]),
+                            row[4],
+                            row[5],
+                            True,
+                        )
+                    )
         except:
             raise
 

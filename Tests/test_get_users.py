@@ -107,7 +107,7 @@ async def test_positive_get_users_by_manager(test_cli):
             email=row["email"],
             name=row["name"],
         )
-        assert False == ('manager' in user.scopes or 'admin' in user.scopes)
+        assert False == ("manager" in user.scopes or "admin" in user.scopes)
 
     assert resp.status == 200
 
@@ -148,15 +148,17 @@ async def test_positive_get_users_by_admin(test_cli):
 
     users = []
     for row in resp_json:
-        users.append(User(
-            user_id=row["user_id"],
-            username=row["username"],
-            hashed_password=row["hashed_password"],
-            scopes=row["scopes"],
-            email=row["email"],
-            name=row["name"],
-        ))
-    assert any(['admin' in x.scopes or 'manger' in x.scopes for x in users])
+        users.append(
+            User(
+                user_id=row["user_id"],
+                username=row["username"],
+                hashed_password=row["hashed_password"],
+                scopes=row["scopes"],
+                email=row["email"],
+                name=row["name"],
+            )
+        )
+    assert any(["admin" in x.scopes or "manger" in x.scopes for x in users])
     assert resp.status == 200
 
 
@@ -168,12 +170,11 @@ async def test_positive_paging(test_cli):
     resp_json = await resp.json()
 
     assert len(resp_json) == 2
-    second_user_id = resp_json[1]['user_id']
+    second_user_id = resp_json[1]["user_id"]
 
     headers = {"Authorization": f"Bearer {access_token}"}
     resp = await test_cli.get("/users?count=1&page=1", headers=headers)
     resp_json = await resp.json()
     assert len(resp_json) == 1
-    assert second_user_id == resp_json[0]['user_id']
+    assert second_user_id == resp_json[0]["user_id"]
     assert resp.status == 200
-

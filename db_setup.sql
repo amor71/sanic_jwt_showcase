@@ -21,11 +21,13 @@ CREATE TABLE IF NOT EXISTS jogging_results(
   time INTEGER NOT NULL,
   location TEXT NOT NULL,
   condition TEXT NOT NULL,
+  week_number INTEGER NOT NULL,
+  year INTEGER NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   expire_at TIMESTAMP,
   modify_user_id INT REFERENCES users(modify_user_id),
   modified_at TIMESTAMP
 );
-
+CREATE INDEX IF NOT EXISTS jogging_results_idx ON jogging_results (week_number, year);
 
 

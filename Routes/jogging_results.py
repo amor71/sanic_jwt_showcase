@@ -5,7 +5,7 @@ from sanic.exceptions import SanicException, InvalidUsage, add_status_code
 from sanic_jwt.decorators import protected
 from jogging.Contectors.darksky import get_weather_condition
 from jogging.Routes.auth import retrieve_user
-from jogging.Models.jogging_result import JoggingResult
+from jogging.Models.jogging_result import JoggingResult, jogging_weekly_report
 
 
 @add_status_code(409)
@@ -101,4 +101,17 @@ async def get_jogging_results(request, *args, **kwargs):
     except Exception as e:
         raise InvalidUsage(e)
 
+    return response.json(rc, status=200)
+
+
+@protected()
+async def get_jogging_weekly_report(request, *args, **kwargs):
+    page = int(request.args["page"][0]) if "page" in request.args else 0
+    limit = int(request.args["count"][0]) if "count" in request.args else 10
+
+    if page < 0 or limit <= 0:
+        raise InvalidUsage("invalid paging (page >= 0 and count > 0)")
+
+    user_id = retrieve_user(request, args, kwargs).user_id
+    rc = jogging_weekly_report(user_id, page, limit)
     return response.json(rc, status=200)

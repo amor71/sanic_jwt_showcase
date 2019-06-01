@@ -1,4 +1,6 @@
 import json
+import pandas as pd
+import sqlite3
 from sqlalchemy.sql import text
 from sqlalchemy.exc import OperationalError
 from .dbhelper import engine
@@ -27,8 +29,8 @@ class JoggingResult(object):
         trans = connection.begin()
         try:
             s = text(
-                "INSERT INTO jogging_results(user_id, location, date, running_distance, time, condition) "
-                "VALUES(:user_id, :location, :date, :running_distance, :time, :condition)"
+                "INSERT INTO jogging_results(user_id, location, date, running_distance, time, condition, week_number, year) "
+                "VALUES(:user_id, :location, :date, :running_distance, :time, :condition, :week_number, :year)"
             )
             connection.execute(
                 s,
@@ -38,6 +40,8 @@ class JoggingResult(object):
                 running_distance=self.distance,
                 time=self.time,
                 condition=self.condition,
+                week_number=self.date.isocalendar()[1],
+                year=self.date.isocalendar()[0],
             )
             trans.commit()
         except:
@@ -73,7 +77,7 @@ class JoggingResult(object):
                 text(s), user_id=user_id, limit=limit, page=page
             ).fetchall()
         except OperationalError as e:
-            raise (e)
+            raise e
 
         rc = (
             [
@@ -87,3 +91,33 @@ class JoggingResult(object):
         )
         connection.close()
         return rc
+
+
+def jogging_weekly_report(user_id: int, page: int, limit: int) -> dict:
+    assert engine
+    s = (
+        "SELECT avg(time*1.0/running_distance), sum(running_distance), week_number, year "
+        "FROM jogging_results "
+        "WHERE user_id = :user_id "
+        "GROUP BY year, week_number "
+        "ORDER BY date LIMIT :limit OFFSET :page"
+        ""
+    )
+    connection = engine.connect()
+    rc = {}
+    try:
+        q_result = connection.execute(
+            text(s), user_id=user_id, limit=limit, page=page
+        ).fetchall()
+
+        for row in q_result:
+            week = {row[2]: (row[0], row[1])}
+            if row[3] not in rc:
+                rc[row[3]] = [week]
+            else:
+                rc[row[3]].append(week)
+
+    except OperationalError as e:
+        raise e
+
+    return rc

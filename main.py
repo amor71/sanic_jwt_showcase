@@ -18,6 +18,7 @@ from jogging.Routes.users import (
 from jogging.Routes.jogging_results import (
     add_jogging_result,
     get_jogging_results,
+    get_jogging_weekly_report,
 )
 from jogging import config
 
@@ -62,7 +63,9 @@ def config_app():
     # config.app.add_route(delete_jogging_result, "/results/<resultId>", methods=["DELETE"])
     # config.app.add_route(get_jogging_result, "/results/<resultId>", methods=["GET"])
     config.app.add_route(get_jogging_results, "/results", methods=["GET"])
-    # config.app.add_route(jogging_report, "/results", methods=["GET"])
+    config.app.add_route(
+        get_jogging_weekly_report, "/results/reports/weekly", methods=["GET"]
+    )
 
 
 if __name__ == "__main__":

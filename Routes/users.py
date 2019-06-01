@@ -47,6 +47,9 @@ async def get_users(request, *args, **kwargs):
     page = int(request.args["page"][0]) if "page" in request.args else 0
     limit = int(request.args["count"][0]) if "count" in request.args else 10
 
+    if page < 0 or limit <= 0:
+        raise InvalidUsage("invalid paging (page >= 0 and count > 0)")
+
     user_id = retrieve_user(request, args, kwargs).user_id
     user = User.get_by_user_id(user_id)
 
@@ -90,21 +93,19 @@ async def update_user(request, *args, **kwargs):
         and "manager" not in user_from_token.scopes
     ):
         if requested_user_id != user_from_token.user_id:
-            raise Forbidden(
-                f"user can only update self"
-            )
+            raise Forbidden(f"user can only update self")
 
     user = User.get_by_user_id(requested_user_id)
     if not user:
         raise InvalidUsage("invalid parameter")
 
-    if "manager" in user_from_token.scopes and "admin" not in user_from_token.scopes and (
-        "manager" in user.scopes or "admin" in user.scopes
+    if (
+        "manager" in user_from_token.scopes
+        and "admin" not in user_from_token.scopes
+        and ("manager" in user.scopes or "admin" in user.scopes)
     ):
         if requested_user_id != user_from_token.user_id:
-            raise Forbidden(
-                f"manager can only update manager"
-            )
+            raise Forbidden(f"manager can only update manager")
 
     if "password" in request.json:
         password = request.json["password"]
