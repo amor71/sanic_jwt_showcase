@@ -80,9 +80,8 @@ async def add_jogging_result(request, *args, **kwargs):
         time,
         json.dumps(condition["data"][0]),
     )
-    jog.save()
-
-    return response.HTTPResponse(status=201)
+    id = jog.save()
+    return response.json({"result_id": id}, status=201)
 
 
 @protected()

@@ -24,30 +24,25 @@ class JoggingResult(object):
             "condition": json.loads(self.condition),
         }
 
-    def save(self):
+    def save(self) -> int:
         connection = engine.connect()
         trans = connection.begin()
         try:
-            s = text(
-                "INSERT INTO jogging_results(user_id, location, date, running_distance, time, condition, week_number, year) "
-                "VALUES(:user_id, :location, :date, :running_distance, :time, :condition, :week_number, :year)"
-            )
-            connection.execute(
-                s,
-                user_id=self.user_id,
-                location=self.location,
-                date=self.date,
-                running_distance=self.distance,
-                time=self.time,
-                condition=self.condition,
-                week_number=self.date.isocalendar()[1],
-                year=self.date.isocalendar()[0],
-            )
+            location = str(self.location)
+            s = f"INSERT INTO " \
+                f"jogging_results(user_id, location, date, running_distance, time, condition, week_number, year)" \
+                f" VALUES({self.user_id}, '{location}', '{self.date}', {self.distance}, {self.time}," \
+                f" '{self.condition}', {self.date.isocalendar()[1]}, {self.date.isocalendar()[0]})"
+            cursor = connection.connection.cursor()
+            cursor.execute(s)
             trans.commit()
-        except:
+            id = cursor.lastrowid
+        except Exception as e:
             trans.rollback()
-            raise
+            raise e
         connection.close()
+
+        return id
 
     @classmethod
     def load(cls, user_id: int, q_filter: str, page: int, limit: int) -> list:

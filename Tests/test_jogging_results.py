@@ -80,6 +80,8 @@ async def test_positive_jogging_result(test_cli):
     resp = await test_cli.post(
         "/results", headers=headers, data=json.dumps(data)
     )
+    resp_json = await resp.json()
+    print(resp_json)
     assert resp.status == 201
 
 
@@ -101,6 +103,8 @@ async def test_positive_load_dataset(test_cli):
         resp = await test_cli.post(
             "/results", headers=headers, data=json.dumps(data)
         )
+        resp_json = await resp.json()
+        print(resp_json)
         assert resp.status == 201
 
 
