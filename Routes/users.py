@@ -66,7 +66,11 @@ async def update_user_scope(request, *args, **kwargs):
     if request.json is None:
         raise InvalidUsage("invalid payload (empty payload not allowed)")
 
-    requested_user_id = int(request.path.split("/")[2])
+    try:
+        requested_user_id = int(request.path.split("/")[2])
+    except ValueError as e:
+        raise InvalidUsage(e)
+
     user_from_token = retrieve_user(request, args, kwargs)
 
     user = User.get_by_user_id(requested_user_id)
@@ -84,8 +88,11 @@ async def update_user_scope(request, *args, **kwargs):
 async def update_user(request, *args, **kwargs):
     if request.json is None:
         raise InvalidUsage("invalid payload (empty payload not allowed)")
+    try:
+        requested_user_id = int(request.path.split("/")[2])
+    except ValueError as e:
+        raise InvalidUsage(e)
 
-    requested_user_id = int(request.path.split("/")[2])
     user_from_token = retrieve_user(request, args, kwargs)
 
     if (

@@ -128,7 +128,7 @@ async def test_positive_get_all_results(test_cli):
 
     resp = await test_cli.get("/results", headers=headers)
     resp_json = await resp.json()
-
+    print(resp_json)
     assert resp.status == 200
 
 
@@ -205,3 +205,103 @@ async def test_positive_check_filters(test_cli):
     resp_json = await resp.json()
     assert resp.status == 200
     assert len(resp_json) == 0
+
+
+async def test_positive_update_and_get(test_cli):
+    global access_token
+    global refresh_token
+    headers = {"Authorization": f"Bearer {access_token}"}
+    data = {
+        "date": "2015-06-20",
+        "distance": 2000,
+        "time": 405,
+        "location": "32.0853 34.7818",
+    }
+
+    resp = await test_cli.post(
+        "/results", headers=headers, data=json.dumps(data)
+    )
+    resp_json = await resp.json()
+    print(resp_json)
+    assert resp.status == 201
+
+    # distance
+    result_id = resp_json['result_id']
+    data = {
+        "distance": 2100,
+    }
+    resp = await test_cli.patch(
+        f"/results/{result_id}", headers=headers, data=json.dumps(data)
+    )
+    assert resp.status == 200
+    resp = await test_cli.get(
+        f"/results/{result_id}", headers=headers
+    )
+    resp_json = await resp.json()
+    assert resp.status == 200
+    assert resp_json['distance'] == data['distance']
+
+    # time
+    result_id = resp_json['result_id']
+    data = {
+        "time": 123,
+    }
+    resp = await test_cli.patch(
+        f"/results/{result_id}", headers=headers, data=json.dumps(data)
+    )
+    assert resp.status == 200
+    resp = await test_cli.get(
+        f"/results/{result_id}", headers=headers
+    )
+    resp_json = await resp.json()
+    assert resp.status == 200
+    assert resp_json['time'] == data['time']
+
+    # date
+    result_id = resp_json['result_id']
+    data = {
+        "date": '2019-01-01',
+    }
+    resp = await test_cli.patch(
+        f"/results/{result_id}", headers=headers, data=json.dumps(data)
+    )
+    assert resp.status == 200
+    resp = await test_cli.get(
+        f"/results/{result_id}", headers=headers
+    )
+    resp_json = await resp.json()
+    assert resp.status == 200
+    assert resp_json['date'] == data['date']
+
+    # location
+    result_id = resp_json['result_id']
+    data = {
+        "location": '32.0853 34.7819',
+    }
+    resp = await test_cli.patch(
+        f"/results/{result_id}", headers=headers, data=json.dumps(data)
+    )
+    assert resp.status == 200
+    resp = await test_cli.get(
+        f"/results/{result_id}", headers=headers
+    )
+    resp_json = await resp.json()
+    assert resp.status == 200
+    assert resp_json['location'] == data['location']
+
+
+async def test_negative_get(test_cli):
+    global access_token
+    global refresh_token
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    resp = await test_cli.get(
+        f"/results/-1", headers=headers)
+    assert resp.status == 400
+
+    resp = await test_cli.get(
+        f"/results/basdasd", headers=headers)
+    assert resp.status == 400
+
+
+
