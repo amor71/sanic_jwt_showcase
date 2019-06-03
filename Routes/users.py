@@ -50,7 +50,10 @@ async def get_users(request, *args, **kwargs):
     if page < 0 or limit <= 0:
         raise InvalidUsage("invalid paging (page >= 0 and count > 0)")
 
-    user_id = retrieve_user(request, args, kwargs).user_id
+    user_from_token = retrieve_user(request, args, kwargs)
+    if user_from_token is None:
+        raise InvalidUsage("invalid parameter (maybe expired?)")
+    user_id = user_from_token.user_id
     user = User.get_by_user_id(user_id)
 
     try:
@@ -72,8 +75,12 @@ async def update_user_scope(request, *args, **kwargs):
         raise InvalidUsage(e)
 
     user_from_token = retrieve_user(request, args, kwargs)
+    if user_from_token is None:
+        raise InvalidUsage("invalid parameter (maybe expired?)")
 
     user = User.get_by_user_id(requested_user_id)
+    if user is None:
+        raise InvalidUsage("invalid user")
 
     if "scopes" in request.json:
         print(request.json)
@@ -82,6 +89,45 @@ async def update_user_scope(request, *args, **kwargs):
     user.save(modifying_user_id=user_from_token.user_id)
 
     return response.HTTPResponse(status=200)
+
+
+@protected()
+async def delete_user(request, *args, **kwargs):
+    try:
+        requested_user_id = int(request.path.split("/")[2])
+    except ValueError as e:
+        raise InvalidUsage(e)
+
+    user_from_token = retrieve_user(request, args, kwargs)
+    if user_from_token is None:
+        raise InvalidUsage("invalid parameter (maybe expired?)")
+
+    user = User.get_by_user_id(requested_user_id)
+    if user is None:
+        raise InvalidUsage("invalid user")
+
+    if (
+        "admin" not in user_from_token.scopes
+        and "manager" not in user_from_token.scopes
+    ):
+        if requested_user_id != user_from_token.user_id:
+            raise Forbidden(f"user can only update self")
+
+    user = User.get_by_user_id(requested_user_id)
+    if not user:
+        raise InvalidUsage("invalid parameter")
+
+    if (
+        "manager" in user_from_token.scopes
+        and "admin" not in user_from_token.scopes
+        and ("manager" in user.scopes or "admin" in user.scopes)
+    ):
+        if requested_user_id != user_from_token.user_id:
+            raise Forbidden(f"manager can only update manager")
+
+    user.expire(user_from_token.user_id)
+
+    return response.HTTPResponse(status=204)
 
 
 @protected()
@@ -94,6 +140,8 @@ async def update_user(request, *args, **kwargs):
         raise InvalidUsage(e)
 
     user_from_token = retrieve_user(request, args, kwargs)
+    if user_from_token is None:
+        raise InvalidUsage("invalid parameter (maybe expired?)")
 
     if (
         "admin" not in user_from_token.scopes

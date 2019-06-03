@@ -51,6 +51,28 @@ class User(object):
         self.scopes = new_scopes
         self.modified = True
 
+    def expire(self, expiring_user_id: int):
+        connection = engine.connect()
+        trans = connection.begin()
+        try:
+            s = text(
+                "UPDATE users "
+                "SET modify_user_id=:modify_user_id, modified_at=datetime('now'), expire_date=date('now') "
+                "WHERE user_id=:user_id"
+            )
+
+            connection.execute(
+                s,
+                user_id=self.user_id,
+                modify_user_id=expiring_user_id,
+            )
+            trans.commit()
+        except:
+            trans.rollback()
+            raise
+        connection.close()
+
+
     def _save_new(self):
         connection = engine.connect()
         trans = connection.begin()
@@ -123,7 +145,9 @@ class User(object):
             s = "SELECT user_id, username, hashed_password, scopes, email, name FROM users "
 
             if "admin" not in self.scopes:
-                s += " WHERE scopes = :scopes "
+                s += " WHERE scopes = :scopes and expire_date is null "
+            else:
+                s += " WHERE expire_date is null "
 
             s += " ORDER BY date(create_date) LIMIT :limit OFFSET :page"
 
@@ -181,7 +205,7 @@ class User(object):
         s = text(
             "SELECT user_id, username, hashed_password, scopes, email, name "
             "FROM users "
-            "WHERE user_id = :user_id"
+            "WHERE user_id = :user_id AND expire_date is null"
         )
         connection = engine.connect()
         rc = connection.execute(s, user_id=user_id).fetchone()

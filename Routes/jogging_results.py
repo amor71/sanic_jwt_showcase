@@ -20,6 +20,10 @@ class Conflict(SanicException):
 
 @protected()
 async def add_jogging_result(request, *args, **kwargs):
+    user_from_token = retrieve_user(request, args, kwargs)
+    if user_from_token is None:
+        raise InvalidUsage("invalid parameter (maybe expired?)")
+
     if (
         request.json is None
         or "date" not in request.json
@@ -91,6 +95,10 @@ async def add_jogging_result(request, *args, **kwargs):
 
 @protected()
 async def update_jogging_result(request, *args, **kwargs):
+    user_from_token = retrieve_user(request, args, kwargs)
+    if user_from_token is None:
+        raise InvalidUsage("invalid parameter (maybe expired?)")
+
     try:
         jogging_id = int(request.path.split("/")[2])
     except ValueError as e:
@@ -104,7 +112,7 @@ async def update_jogging_result(request, *args, **kwargs):
     if jog is None:
         raise InvalidUsage("invalid id")
 
-    user_id_from_token = retrieve_user(request, args, kwargs).user_id
+    user_id_from_token = user_from_token.user_id
     if user_id_from_token != jog.user_id:
         raise Forbidden("user can only access user jogs")
 
@@ -174,6 +182,10 @@ async def update_jogging_result(request, *args, **kwargs):
 
 @protected()
 async def get_jogging_results(request, *args, **kwargs):
+    user_from_token = retrieve_user(request, args, kwargs)
+    if user_from_token is None:
+        raise InvalidUsage("invalid parameter (maybe expired?)")
+
     page = int(request.args["page"][0]) if "page" in request.args else 0
     limit = int(request.args["count"][0]) if "count" in request.args else 10
 
@@ -181,7 +193,9 @@ async def get_jogging_results(request, *args, **kwargs):
         raise InvalidUsage("invalid paging (page >= 0 and count > 0)")
 
     q_filter = request.args["filter"][0] if "filter" in request.args else None
-    user_id = retrieve_user(request, args, kwargs).user_id
+
+
+    user_id = user_from_token.user_id
 
     try:
         rc = JoggingResult.load_by_user_id(user_id, q_filter, page, limit)
@@ -193,6 +207,10 @@ async def get_jogging_results(request, *args, **kwargs):
 
 @protected()
 async def get_jogging_result(request, *args, **kwargs):
+    user_from_token = retrieve_user(request, args, kwargs)
+    if user_from_token is None:
+        raise InvalidUsage("invalid parameter (maybe expired?)")
+
     try:
         jogging_id = int(request.path.split("/")[2])
     except ValueError as e:
@@ -215,6 +233,10 @@ async def get_jogging_result(request, *args, **kwargs):
 
 @protected()
 async def delete_jogging_result(request, *args, **kwargs):
+    user_from_token = retrieve_user(request, args, kwargs)
+    if user_from_token is None:
+        raise InvalidUsage("invalid parameter (maybe expired?)")
+
     try:
         jogging_id = int(request.path.split("/")[2])
     except ValueError as e:
@@ -239,6 +261,10 @@ async def delete_jogging_result(request, *args, **kwargs):
 
 @protected()
 async def get_jogging_weekly_report(request, *args, **kwargs):
+    user_from_token = retrieve_user(request, args, kwargs)
+    if user_from_token is None:
+        raise InvalidUsage("invalid parameter (maybe expired?)")
+
     page = int(request.args["page"][0]) if "page" in request.args else 0
     limit = int(request.args["count"][0]) if "count" in request.args else 10
 

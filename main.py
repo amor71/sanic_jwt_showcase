@@ -14,6 +14,7 @@ from jogging.Routes.users import (
     get_users,
     update_user,
     update_user_scope,
+    delete_user
 )
 from jogging.Routes.jogging_results import (
     add_jogging_result,
@@ -58,13 +59,20 @@ def config_app():
         update_user_scope, "/users/<userId>/scopes", methods=["PATCH"]
     )
     config.app.add_route(update_user, "/users/<userId>", methods=["PATCH"])
+    config.app.add_route(delete_user, "/users/<userId>", methods=["DELETE"])
     #
     # jogging routes
     #
     config.app.add_route(add_jogging_result, "/results", methods=["POST"])
-    config.app.add_route(update_jogging_result, "/results/<resultId>", methods=["PATCH"])
-    config.app.add_route(get_jogging_result, "/results/<resultId>", methods=["GET"])
-    config.app.add_route(delete_jogging_result, "/results/<resultId>", methods=["DELETE"])
+    config.app.add_route(
+        update_jogging_result, "/results/<resultId>", methods=["PATCH"]
+    )
+    config.app.add_route(
+        get_jogging_result, "/results/<resultId>", methods=["GET"]
+    )
+    config.app.add_route(
+        delete_jogging_result, "/results/<resultId>", methods=["DELETE"]
+    )
     config.app.add_route(get_jogging_results, "/results", methods=["GET"])
     config.app.add_route(
         get_jogging_weekly_report, "/results/reports/weekly", methods=["GET"]
