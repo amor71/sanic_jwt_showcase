@@ -304,4 +304,73 @@ async def test_negative_get(test_cli):
     assert resp.status == 400
 
 
+async def test_positive_delete(test_cli):
+    global access_token
+    global refresh_token
+    headers = {"Authorization": f"Bearer {access_token}"}
+    data = {
+        "date": "2015-06-20",
+        "distance": 2000,
+        "time": 405,
+        "location": "32.0853 34.7818",
+    }
+
+    resp = await test_cli.post(
+        "/results", headers=headers, data=json.dumps(data)
+    )
+    resp_json = await resp.json()
+    print(resp_json)
+    assert resp.status == 201
+
+    # delete
+    result_id = resp_json['result_id']
+    resp = await test_cli.delete(
+        f"/results/{result_id}", headers=headers
+    )
+    assert resp.status == 204
+
+
+async def test_negative_delete(test_cli):
+    global access_token
+    global refresh_token
+    headers = {"Authorization": f"Bearer {access_token}"}
+    data = {
+        "date": "2015-06-20",
+        "distance": 2000,
+        "time": 405,
+        "location": "32.0853 34.7818",
+    }
+
+    resp = await test_cli.post(
+        "/results", headers=headers, data=json.dumps(data)
+    )
+    resp_json = await resp.json()
+    print(resp_json)
+    assert resp.status == 201
+
+    # delete
+    result_id = resp_json['result_id']
+    resp = await test_cli.delete(
+        f"/results/{result_id}", headers=headers
+    )
+    assert resp.status == 204
+
+    # delete
+    result_id = resp_json['result_id']
+    resp = await test_cli.delete(
+        f"/results/{result_id}", headers=headers
+    )
+    assert resp.status == 400
+
+    resp = await test_cli.delete(
+        f"/results/sadfkjahsdkfhsf", headers=headers
+    )
+    assert resp.status == 400
+
+    resp = await test_cli.delete(
+        f"/results/67676767676767", headers=headers
+    )
+    assert resp.status == 400
+
+
 

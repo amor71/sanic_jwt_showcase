@@ -88,6 +88,26 @@ class JoggingResult:
         else:
             return self._update()
 
+    def delete(self):
+        assert engine
+        if self.result_id:
+            connection = engine.connect()
+            trans = connection.begin()
+            try:
+                s = text(
+                    f"DELETE FROM jogging_results WHERE result_id=:result_id"
+                )
+                connection.execute(
+                    s,
+                    result_id=self.result_id,
+                )
+                trans.commit()
+
+            except Exception as e:
+                trans.rollback()
+                raise e
+            connection.close()
+
     @staticmethod
     def load_by_user_id(
         user_id: int, q_filter: str, page: int, limit: int

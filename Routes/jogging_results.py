@@ -214,6 +214,30 @@ async def get_jogging_result(request, *args, **kwargs):
 
 
 @protected()
+async def delete_jogging_result(request, *args, **kwargs):
+    try:
+        jogging_id = int(request.path.split("/")[2])
+    except ValueError as e:
+        raise InvalidUsage(e)
+
+    if jogging_id < 0:
+        raise InvalidUsage("invalid id")
+
+    jog = JoggingResult.load_by_jogging_id(jogging_id)
+
+    if jog is None:
+        raise InvalidUsage("invalid id")
+
+    user_id_from_token = retrieve_user(request, args, kwargs).user_id
+    if user_id_from_token != jog.user_id:
+        raise Forbidden("user can only access user jogs")
+
+    jog.delete()
+
+    return response.HTTPResponse(status=204)
+
+
+@protected()
 async def get_jogging_weekly_report(request, *args, **kwargs):
     page = int(request.args["page"][0]) if "page" in request.args else 0
     limit = int(request.args["count"][0]) if "count" in request.args else 10
