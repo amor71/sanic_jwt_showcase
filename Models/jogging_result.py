@@ -186,7 +186,7 @@ class JoggingResult:
 def jogging_weekly_report(user_id: int, page: int, limit: int) -> dict:
     assert engine
     s = (
-        "SELECT avg(time*1.0/running_distance), sum(running_distance), week_number, year "
+        "SELECT avg(running_distance*1.0/time), sum(running_distance), week_number, year "
         "FROM jogging_results "
         "WHERE user_id = :user_id "
         "GROUP BY year, week_number "

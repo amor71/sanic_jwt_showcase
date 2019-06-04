@@ -188,21 +188,23 @@ async def test_positive_check_filters(test_cli):
         headers=headers,
     )
     resp_json = await resp.json()
+    print (resp_json)
     assert resp.status == 200
-    assert len(resp_json) == 4
+    assert len(resp_json) == 9
 
     resp = await test_cli.get(
         "/results?filter=distance ne 2000", headers=headers
     )
     resp_json = await resp.json()
     assert resp.status == 200
-    assert len(resp_json) == 8
+    assert len(resp_json) == 10
 
     resp = await test_cli.get(
         "/results?filter=distance ne 2000 and ((time lt 400) and (time gt 390))",
         headers=headers,
     )
     resp_json = await resp.json()
+
     assert resp.status == 200
     assert len(resp_json) == 0
 
