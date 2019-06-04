@@ -72,7 +72,7 @@ async def test_positive_update_name(test_cli):
     resp = await test_cli.patch(
         f"/users/{my_user_id}", headers=headers, data=json.dumps(data)
     )
-    assert resp.status == 200
+    assert resp.status == 204
 
     # confirm updated!
     headers = {"Authorization": f"Bearer {access_token}"}
@@ -99,7 +99,7 @@ async def test_positive_update_email(test_cli):
     resp = await test_cli.patch(
         f"/users/{my_user_id}", headers=headers, data=json.dumps(data)
     )
-    assert resp.status == 200
+    assert resp.status == 204
 
     # confirm updated!
     headers = {"Authorization": f"Bearer {access_token}"}
@@ -127,7 +127,7 @@ async def test_positive_update_password(test_cli):
     resp = await test_cli.patch(
         f"/users/{my_user_id}", headers=headers, data=json.dumps(data)
     )
-    assert resp.status == 200
+    assert resp.status == 204
 
     data = {"username": username, "password": password}
     resp = await test_cli.post("/auth", data=json.dumps(data))
@@ -177,7 +177,7 @@ async def test_positive_update_email_by_manager(test_cli):
     resp = await test_cli.patch(
         f"/users/{my_user_id}/scopes", headers=headers, data=json.dumps(data)
     )
-    assert resp.status == 200
+    assert resp.status == 204
     manager_access_token = access_token
 
     global username
@@ -224,7 +224,7 @@ async def test_positive_update_email_by_manager(test_cli):
     resp = await test_cli.patch(
         f"/users/{new_user_id}", headers=headers, data=json.dumps(data)
     )
-    assert resp.status == 200
+    assert resp.status == 204
 
     # confirm updated!
     headers = {"Authorization": f"Bearer {access_token}"}
@@ -251,7 +251,7 @@ async def test_negative_manager_update_manager(test_cli):
     resp = await test_cli.patch(
         f"/users/{my_user_id}/scopes", headers=headers, data=json.dumps(data)
     )
-    assert resp.status == 200
+    assert resp.status == 204
     manager_access_token = access_token
 
     # register second
@@ -299,7 +299,7 @@ async def test_negative_manager_update_manager(test_cli):
         headers=headers,
         data=json.dumps(data),
     )
-    assert resp.status == 200
+    assert resp.status == 204
 
     # first manager update second manager
     new_name = "some new name"
@@ -327,7 +327,7 @@ async def test_positive_admin_update_manager(test_cli):
     resp = await test_cli.patch(
         f"/users/{my_user_id}/scopes", headers=headers, data=json.dumps(data)
     )
-    assert resp.status == 200
+    assert resp.status == 204
     manager_access_token = access_token
 
     # register second
@@ -375,7 +375,7 @@ async def test_positive_admin_update_manager(test_cli):
         headers=headers,
         data=json.dumps(data),
     )
-    assert resp.status == 200
+    assert resp.status == 204
 
     # first manager update second manager
     new_name = "some new name"
@@ -384,7 +384,7 @@ async def test_positive_admin_update_manager(test_cli):
     resp = await test_cli.patch(
         f"/users/{new_manager_user_id}", headers=headers, data=json.dumps(data)
     )
-    assert resp.status == 200
+    assert resp.status == 204
 
 
 async def test_positive_admin_update_admin(test_cli):
@@ -403,7 +403,7 @@ async def test_positive_admin_update_admin(test_cli):
     resp = await test_cli.patch(
         f"/users/{my_user_id}/scopes", headers=headers, data=json.dumps(data)
     )
-    assert resp.status == 200
+    assert resp.status == 204
     manager_access_token = access_token
 
     # register second
@@ -451,7 +451,7 @@ async def test_positive_admin_update_admin(test_cli):
         headers=headers,
         data=json.dumps(data),
     )
-    assert resp.status == 200
+    assert resp.status == 204
 
     # first admin update second admin
     new_name = "some new name"
@@ -460,7 +460,7 @@ async def test_positive_admin_update_admin(test_cli):
     resp = await test_cli.patch(
         f"/users/{new_manager_user_id}", headers=headers, data=json.dumps(data)
     )
-    assert resp.status == 200
+    assert resp.status == 204
 
 
 async def test_positive_admin_update_user(test_cli):
@@ -479,7 +479,7 @@ async def test_positive_admin_update_user(test_cli):
     resp = await test_cli.patch(
         f"/users/{my_user_id}/scopes", headers=headers, data=json.dumps(data)
     )
-    assert resp.status == 200
+    assert resp.status == 204
     manager_access_token = access_token
 
     # register second
@@ -526,4 +526,4 @@ async def test_positive_admin_update_user(test_cli):
     resp = await test_cli.patch(
         f"/users/{new_manager_user_id}", headers=headers, data=json.dumps(data)
     )
-    assert resp.status == 200
+    assert resp.status == 204

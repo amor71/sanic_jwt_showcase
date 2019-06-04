@@ -88,7 +88,7 @@ async def update_user_scope(request, *args, **kwargs):
 
     user.save(modifying_user_id=user_from_token.user_id)
 
-    return response.HTTPResponse(status=200)
+    return response.HTTPResponse(status=204)
 
 
 @protected()
@@ -175,4 +175,4 @@ async def update_user(request, *args, **kwargs):
 
     user.save(modifying_user_id=user_from_token.user_id)
 
-    return response.HTTPResponse(status=200)
+    return response.HTTPResponse(status=204)

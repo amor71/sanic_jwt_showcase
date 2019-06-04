@@ -60,7 +60,8 @@ async def test_negative_get_users_by_user(test_cli):
     global access_token
     headers = {"Authorization": f"Bearer {access_token}"}
     resp = await test_cli.get("/users", headers=headers)
-
+    resp_json = await resp.json()
+    print(resp_json)
     assert resp.status == 403
 
 
@@ -80,7 +81,7 @@ async def test_positive_get_users_by_manager(test_cli):
     resp = await test_cli.patch(
         f"/users/{my_user_id}/scopes", headers=headers, data=json.dumps(data)
     )
-    assert resp.status == 200
+    assert resp.status == 204
 
     # re-login to get access token w/ new scope
     data = {"username": username, "password": "testing123G"}
@@ -98,6 +99,7 @@ async def test_positive_get_users_by_manager(test_cli):
     resp = await test_cli.get("/users", headers=headers)
     resp_json = await resp.json()
 
+    print(resp_json)
     for row in resp_json:
         user = User(
             user_id=row["user_id"],
@@ -128,7 +130,7 @@ async def test_positive_get_users_by_admin(test_cli):
     resp = await test_cli.patch(
         f"/users/{my_user_id}/scopes", headers=headers, data=json.dumps(data)
     )
-    assert resp.status == 200
+    assert resp.status == 204
 
     # re-login to get access token w/ new scope
     data = {"username": username, "password": "testing123G"}
@@ -145,7 +147,7 @@ async def test_positive_get_users_by_admin(test_cli):
     headers = {"Authorization": f"Bearer {access_token}"}
     resp = await test_cli.get("/users?count=1000", headers=headers)
     resp_json = await resp.json()
-
+    print(resp_json)
     users = []
     for row in resp_json:
         users.append(
