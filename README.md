@@ -1,5 +1,5 @@
-## "Jogging Results"
-###### v0.1 Jun 2019 by Amichay Oren
+## JWT Showcasing
+
 
 ### Requirements Summary
 
