@@ -142,13 +142,14 @@ class User(object):
         connection = engine.connect()
         rc = []
         try:
-            s = "SELECT user_id, username, hashed_password, scopes, email, name FROM users "
-
-            if "admin" not in self.scopes:
-                s += " WHERE scopes = :scopes and expire_date is null "
-            else:
-                s += " WHERE expire_date is null "
-
+            s = (
+                "SELECT user_id, username, hashed_password, scopes, email, name FROM users "
+                + (
+                    " WHERE scopes = :scopes and expire_date is null "
+                    if "admin" not in self.scopes
+                    else " WHERE expire_date is null "
+                )
+            )
             s += " ORDER BY date(create_date) LIMIT :limit OFFSET :page"
 
             q_result = connection.execute(
@@ -157,18 +158,18 @@ class User(object):
 
             print(s, json.dumps(["user"]))
             if q_result:
-                for row in q_result:
-                    rc.append(
-                        User(
-                            row[0],
-                            row[1],
-                            row[2].decode("utf-8"),
-                            json.loads(row[3]),
-                            row[4],
-                            row[5],
-                            True,
-                        )
+                rc.extend(
+                    User(
+                        row[0],
+                        row[1],
+                        row[2].decode("utf-8"),
+                        json.loads(row[3]),
+                        row[4],
+                        row[5],
+                        True,
                     )
+                    for row in q_result
+                )
         except:
             raise
 
@@ -233,10 +234,6 @@ class User(object):
         )
         connection = engine.connect()
 
-        rc = (
-            False
-            if connection.execute(s, username=username).fetchone() is None
-            else True
-        )
+        rc = connection.execute(s, username=username).fetchone() is not None
         connection.close()
         return rc
