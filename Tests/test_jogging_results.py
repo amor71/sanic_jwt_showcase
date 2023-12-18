@@ -297,12 +297,10 @@ async def test_negative_get(test_cli):
     global refresh_token
     headers = {"Authorization": f"Bearer {access_token}"}
 
-    resp = await test_cli.get(
-        f"/results/-1", headers=headers)
+    resp = await test_cli.get("/results/-1", headers=headers)
     assert resp.status == 400
 
-    resp = await test_cli.get(
-        f"/results/basdasd", headers=headers)
+    resp = await test_cli.get("/results/basdasd", headers=headers)
     assert resp.status == 400
 
 
@@ -364,14 +362,10 @@ async def test_negative_delete(test_cli):
     )
     assert resp.status == 400
 
-    resp = await test_cli.delete(
-        f"/results/sadfkjahsdkfhsf", headers=headers
-    )
+    resp = await test_cli.delete("/results/sadfkjahsdkfhsf", headers=headers)
     assert resp.status == 400
 
-    resp = await test_cli.delete(
-        f"/results/67676767676767", headers=headers
-    )
+    resp = await test_cli.delete("/results/67676767676767", headers=headers)
     assert resp.status == 400
 
 

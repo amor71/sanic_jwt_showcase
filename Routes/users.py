@@ -111,19 +111,19 @@ async def delete_user(request, *args, **kwargs):
         and "manager" not in user_from_token.scopes
     ):
         if requested_user_id != user_from_token.user_id:
-            raise Forbidden(f"user can only update self")
+            raise Forbidden("user can only update self")
 
     user = User.get_by_user_id(requested_user_id)
     if not user:
         raise InvalidUsage("invalid parameter")
 
-    if (
-        "manager" in user_from_token.scopes
-        and "admin" not in user_from_token.scopes
-        and ("manager" in user.scopes or "admin" in user.scopes)
-    ):
-        if requested_user_id != user_from_token.user_id:
-            raise Forbidden(f"manager can only update manager")
+    if requested_user_id != user_from_token.user_id:
+        if     (
+            "manager" in user_from_token.scopes
+            and "admin" not in user_from_token.scopes
+            and ("manager" in user.scopes or "admin" in user.scopes)
+        ):
+            raise Forbidden("manager can only update manager")
 
     user.expire(user_from_token.user_id)
 
@@ -148,19 +148,19 @@ async def update_user(request, *args, **kwargs):
         and "manager" not in user_from_token.scopes
     ):
         if requested_user_id != user_from_token.user_id:
-            raise Forbidden(f"user can only update self")
+            raise Forbidden("user can only update self")
 
     user = User.get_by_user_id(requested_user_id)
     if not user:
         raise InvalidUsage("invalid parameter")
 
-    if (
-        "manager" in user_from_token.scopes
-        and "admin" not in user_from_token.scopes
-        and ("manager" in user.scopes or "admin" in user.scopes)
-    ):
-        if requested_user_id != user_from_token.user_id:
-            raise Forbidden(f"manager can only update manager")
+    if requested_user_id != user_from_token.user_id:
+        if     (
+            "manager" in user_from_token.scopes
+            and "admin" not in user_from_token.scopes
+            and ("manager" in user.scopes or "admin" in user.scopes)
+        ):
+            raise Forbidden("manager can only update manager")
 
     if "password" in request.json:
         password = request.json["password"]

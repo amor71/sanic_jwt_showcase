@@ -55,11 +55,7 @@ class JoggingResult:
         trans = connection.begin()
         try:
             s = text(
-                f"UPDATE jogging_results SET "
-                f"user_id=:user_id, location=:location, date=:date,"
-                f"running_distance=:distance, time=:time,"
-                f"condition=:condition, week_number=:week_number, year=:year "
-                f"WHERE result_id=:result_id"
+                'UPDATE jogging_results SET user_id=:user_id, location=:location, date=:date,running_distance=:distance, time=:time,condition=:condition, week_number=:week_number, year=:year WHERE result_id=:result_id'
             )
             connection.execute(
                 s,
@@ -83,10 +79,7 @@ class JoggingResult:
         return self.result_id
 
     def save(self) -> int:
-        if not self.result_id:
-            return self._save()
-        else:
-            return self._update()
+        return self._save() if not self.result_id else self._update()
 
     def delete(self):
         assert engine
@@ -94,9 +87,7 @@ class JoggingResult:
             connection = engine.connect()
             trans = connection.begin()
             try:
-                s = text(
-                    f"DELETE FROM jogging_results WHERE result_id=:result_id"
-                )
+                s = text("DELETE FROM jogging_results WHERE result_id=:result_id")
                 connection.execute(
                     s,
                     result_id=self.result_id,

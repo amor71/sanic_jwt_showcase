@@ -148,19 +148,18 @@ async def test_positive_get_users_by_admin(test_cli):
     resp = await test_cli.get("/users?count=1000", headers=headers)
     resp_json = await resp.json()
     print(resp_json)
-    users = []
-    for row in resp_json:
-        users.append(
-            User(
-                user_id=row["user_id"],
-                username=row["username"],
-                hashed_password=row["hashed_password"],
-                scopes=row["scopes"],
-                email=row["email"],
-                name=row["name"],
-            )
+    users = [
+        User(
+            user_id=row["user_id"],
+            username=row["username"],
+            hashed_password=row["hashed_password"],
+            scopes=row["scopes"],
+            email=row["email"],
+            name=row["name"],
         )
-    assert any(["admin" in x.scopes or "manger" in x.scopes for x in users])
+        for row in resp_json
+    ]
+    assert any("admin" in x.scopes or "manger" in x.scopes for x in users)
     assert resp.status == 200
 
 

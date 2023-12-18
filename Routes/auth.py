@@ -30,11 +30,9 @@ async def authenticate(request, *args, **kwargs):
 
 def password_validator(password):
     return (
-        False
-        if not any(char.isdigit() for char in password)
-        or not any(char.islower() for char in password)
-        or not any(char.isupper() for char in password)
-        else True
+        any(char.isdigit() for char in password)
+        and any(char.islower() for char in password)
+        and any(char.isupper() for char in password)
     )
 
 
@@ -57,8 +55,7 @@ async def store_refresh_token(user_id, refresh_token, *args, **kwargs):
 
 
 async def retrieve_refresh_token(request, user_id, *args, **kwargs):
-    found_token = await config.redis_client.get(f"user_id:{user_id}")
-    return found_token
+    return await config.redis_client.get(f"user_id:{user_id}")
 
 
 def retrieve_user(request, *args, **kwargs):
